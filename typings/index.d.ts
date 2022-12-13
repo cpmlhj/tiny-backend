@@ -1,3 +1,7 @@
+/// <reference types="egg-validate" />
+/// <reference types="egg-redis" />
+/// <reference types="egg-jwt" />
+
 import 'egg';
 import { UserSchemaProps } from '../app/model/user';
 import { Model } from 'mongoose';
@@ -9,9 +13,21 @@ declare module 'egg' {
   };
   interface Context {
     model: MongooseModels;
+    genHash(plainText: string): Promise<string>;
+    compare(plainText: string, hash: string): Promise<boolean>;
   }
   interface Application {
     model: MongooseModels;
     mongoose: typeof mongoose;
+    sessionMap: {
+      [key: string]: any;
+    };
+    sessionStore: any;
+  }
+
+  interface EggAppConfig {
+    bcrypt: {
+      saltRounds: number;
+    };
   }
 }
