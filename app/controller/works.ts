@@ -1,7 +1,7 @@
 import { Controller } from 'egg';
-import { worksCreateRules } from '../contants';
+import { worksCreateRules, channelCreateRules } from '../contants';
 import { validInput, checkAppPermission } from '../decorator';
-
+import { nanoid } from 'nanoid';
 export interface IndexCondition {
   pageIndex?: number;
   pageSize?: number;
@@ -86,17 +86,6 @@ export default class Works extends Controller {
     ctx.helper.success({ ctx, resp: res });
   }
 
-  // async checkPermission(id: number) {
-  //   const { ctx } = this;
-  //   // 获取当前用户ID
-  //   const { _id: userId } = ctx.state.user;
-  //   // 查询作品信息
-  //   const work = await ctx.model.Work.findOne({ id });
-  //   if (!work) return false;
-  //   // 转换为字符串  比较
-  //   return work.user.toString() === userId;
-  // }
-
   @checkAppPermission('Work', 'workPermissionFail')
   async updateApp() {
     const { ctx } = this;
@@ -122,5 +111,69 @@ export default class Works extends Controller {
     const { ctx } = this;
     const url = await ctx.service.works.publishApp(ctx.params.id);
     ctx.helper.success({ ctx, resp: { url } });
+  }
+
+  /**
+   * 创建渠道
+   * @param {name: string}  渠道名称
+   * @param {workId: string} 作品ID
+   */
+  @validInput(channelCreateRules, 'workCreateChannelFail')
+  async createChannel() {
+    const { ctx } = this;
+    const { name, workId } = ctx.request.body;
+    const newChannel = {
+      name,
+      id: nanoid(6),
+    };
+    await ctx.model.Work.findOneAndUpdate(
+      { id: workId },
+      {
+        $push: { channels: newChannel },
+      }
+    );
+    ctx.helper.success({ ctx, resp: newChannel });
+  }
+
+  /**
+   * 查找渠道
+   * @param {id: string}  作品ID
+   */
+  async getWorksChannel() {
+    const { ctx } = this;
+    const { id } = ctx.params;
+    const { channels } = (await ctx.model.Work.findOne({ id }).lean()) || {};
+    ctx.helper.success({ ctx, resp: { channels, count: channels?.length } });
+  }
+
+  async updateChannelName() {
+    const { ctx } = this;
+    const { channelId } = ctx.params;
+    const { name } = ctx.request.body;
+    const resp = await ctx.model.Work.findOneAndUpdate(
+      {
+        'channels.id': channelId,
+      },
+      {
+        $set: { 'channels.$.name': name },
+      }
+    );
+    if (resp) return ctx.helper.success({ ctx, resp: name });
+    return ctx.helper.error({ ctx, errorType: 'workUpdateChannelFail' });
+  }
+
+  async deleteChannel() {
+    const { ctx } = this;
+    const { channelId } = ctx.params;
+    const resp = await ctx.model.Work.findOneAndUpdate(
+      {
+        'channels.id': channelId,
+      },
+      {
+        $pull: { channels: { id: channelId } },
+      }
+    );
+    if (resp) return ctx.helper.success({ ctx, resp });
+    return ctx.helper.error({ ctx, errorType: 'workDeleteChannelFail' });
   }
 }

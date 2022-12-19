@@ -56,10 +56,10 @@ export default class User extends Controller {
     const { phoneNumber } = ctx.request.body;
     const preVeriCode = await app.redis.get(`phoneVeriCode-${phoneNumber}`);
     if (preVeriCode) {
-      // ctx.helper.error({
-      //   ctx,
-      //   errorType: 'sendVeriCodeFrequentlyFailInfo',
-      // });
+      ctx.helper.error({
+        ctx,
+        errorType: 'sendVeriCodeFrequentlyFailInfo',
+      });
     }
     const veriCode = Math.floor(Math.random() * 9000 + 1000).toString();
     // 发送短信

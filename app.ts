@@ -7,6 +7,7 @@ export default class AppBoot implements IBoot {
   }
 
   configWillLoad(): void {
+    this.app.config.coreMiddleware.push('customError');
     console.log('enable mid', this.app.config.coreMiddleware);
   }
   async didReady(): Promise<void> {

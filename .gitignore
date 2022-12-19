@@ -9,7 +9,6 @@ logs/
 .vscode
 *.swp
 *.lock
-*.js
 !.autod.conf.js
 
 app/**/*.js
@@ -20,3 +19,4 @@ test/**/*.map
 config/**/*.map
 typings/app/**
 typings/config/**
+webpack/uploadCdn.js

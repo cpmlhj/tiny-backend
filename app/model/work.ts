@@ -2,6 +2,11 @@ import { Application } from 'egg';
 import { Schema, Types } from 'mongoose';
 import AutoIncrementFactory from 'mongoose-sequence';
 
+export interface Channel {
+  id: string;
+  name: string;
+}
+
 export interface Works {
   uuid: string;
   title: string;
@@ -15,6 +20,7 @@ export interface Works {
   status?: 0 | 1 | 2;
   user: Types.ObjectId;
   lastPublishAt?: Date;
+  channels: Channel[];
 }
 
 export default (app: Application) => {

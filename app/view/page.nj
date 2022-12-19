@@ -1,0 +1,2 @@
+<!doctype html><html lang=""><head><meta charset="utf-8"><title>{{title}}</title><meta name="description" content="{{desc}}"><meta name="viewport" content="width=device-width,user-scalable=no,initial-scale=1"><link rel="stylesheet
+        " href="//cdn.bootcdn.net/ajax/libs/minireset.css/0.0.2/minireset.min.css"><script defer="defer" src="/public/bundle.afed51ec025f3b2c8ed3.js"></script><link href="/public/main.afed51ec025f3b2c8ed3.css" rel="stylesheet"></head><body style="{{bodyStyle}}"><div id="app">{{html | safe}}</div></body></html>

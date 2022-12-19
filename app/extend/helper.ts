@@ -1,5 +1,10 @@
 import { Context } from 'egg';
-import { userErrorMessage, worksErrorMessage, errorType } from '../contants';
+import {
+  userErrorMessage,
+  worksErrorMessage,
+  errorType,
+  utilsErrorMessage,
+} from '../contants';
 import { AliYunClient } from '../utils/sms';
 interface ResponeType {
   ctx: Context;
@@ -19,6 +24,7 @@ export type ThiryPartyServer = 'A' | 'T';
 const ErrorMessage = {
   ...userErrorMessage,
   ...worksErrorMessage,
+  ...utilsErrorMessage,
 };
 
 export default {

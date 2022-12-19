@@ -6,6 +6,7 @@
  * C: 错误码具体编号，自增即可
  */
 
+/** ---------   userError ---------    */
 export const userErrorMessage = {
   UserValidateFail: {
     errno: 1010001,
@@ -37,6 +38,7 @@ export const userErrorMessage = {
   },
 };
 
+/** ---------   worksError ---------    */
 export const worksErrorMessage = {
   worksValidateFail: {
     errno: 1020001,
@@ -45,6 +47,39 @@ export const worksErrorMessage = {
   workPermissionFail: {
     errno: 1020002,
     message: '没有权限操作',
+  },
+  workRenderFail: {
+    errno: 1020003,
+    message: '作品渲染错误',
+  },
+  workCreateChannelFail: {
+    errno: 1020004,
+    message: '作品创建渠道失败',
+  },
+  workUpdateChannelFail: {
+    errno: 1020005,
+    message: '作品渠道名称更新失败',
+  },
+  workDeleteChannelFail: {
+    errno: 1020005,
+    message: '作品渠道名删除失败',
+  },
+};
+
+/** ---------   utilsError ---------    */
+
+export const utilsErrorMessage = {
+  imageUpLoadFialInfo: {
+    errno: 103001,
+    message: '图片上传失败',
+  },
+  imageUpLoadSizeFialInfo: {
+    errno: 103002,
+    message: '上传文件大小已超出限制',
+  },
+  imageUpLoadFormatFialInfo: {
+    errno: 103003,
+    message: '上传文件格式错误',
   },
 };
 
@@ -57,6 +92,11 @@ export const worksCreateRules = {
   title: 'string',
 };
 
+export const channelCreateRules = {
+  name: 'string',
+  workdId: 'string',
+};
+
 export const sendCodeRules = {
   phoneNumber: {
     type: 'string',
@@ -67,4 +107,5 @@ export const sendCodeRules = {
 
 export type errorType =
   | keyof typeof userErrorMessage
-  | keyof typeof worksErrorMessage;
+  | keyof typeof worksErrorMessage
+  | keyof typeof utilsErrorMessage;
