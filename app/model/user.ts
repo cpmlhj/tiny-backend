@@ -2,6 +2,8 @@ import { Application } from 'egg';
 import { Schema } from 'mongoose';
 import AutoIncrementFactory from 'mongoose-sequence';
 
+export type Roles = 'admin' | 'normal';
+
 export interface UserSchemaProps {
   username: string;
   password: string;
@@ -14,6 +16,7 @@ export interface UserSchemaProps {
   type: 'email' | 'cellPhone' | 'oauth';
   provider?: 'gitee' | 'github' | 'wechat';
   oauthID?: string;
+  role?: Roles;
 }
 
 function UserModel(app: Application) {
@@ -29,6 +32,7 @@ function UserModel(app: Application) {
       type: { type: String, default: 'email' },
       provider: { type: String },
       oauthID: { type: String },
+      role: { type: String, default: 'normal' },
     },
     {
       timestamps: true,

@@ -21,13 +21,10 @@ export default (app: Application) => {
   router.post('/works/add', controller.works.createWork);
   router.get('/works/list', controller.works.appList);
   router.get('/works/templatelist', controller.works.getTemplateList);
+  router.get('/works/:id', controller.works.getSingleWork);
   router.patch('/works/:id', controller.works.updateApp);
   router.delete('/works/:id', controller.works.deleteApp);
-  router.post(
-    '/works/publish/:id',
-
-    controller.works.publishApp
-  );
+  router.post('/works/publish/:id', controller.works.publishApp);
   router.post('/channel', controller.works.createChannel);
   router.get('/getWorksChannel/:id', controller.works.getWorksChannel);
 

@@ -13,6 +13,7 @@ export interface IndexCondition {
 
 export default class Works extends Controller {
   @validInput(worksCreateRules, 'worksValidateFail')
+  @checkAppPermission('Work', 'workPermissionFail')
   async createWork() {
     const { ctx, service } = this;
     await service.works.createWorks(ctx.request.body);
@@ -87,6 +88,14 @@ export default class Works extends Controller {
   }
 
   @checkAppPermission('Work', 'workPermissionFail')
+  async getSingleWork() {
+    const { ctx } = this;
+    const { id } = ctx.params;
+    const res = await ctx.model.Work.findOne({ id }).lean();
+    ctx.helper.success({ ctx, resp: res });
+  }
+
+  @checkAppPermission('Work', 'workPermissionFail')
   async updateApp() {
     const { ctx } = this;
     const { id } = ctx.params;
@@ -106,7 +115,7 @@ export default class Works extends Controller {
       .lean();
     ctx.helper.success({ ctx, resp: res });
   }
-  @checkAppPermission('Work', 'workPermissionFail')
+  @checkAppPermission('Work', 'workPermissionFail', { action: 'publish' })
   async publishApp() {
     const { ctx } = this;
     const url = await ctx.service.works.publishApp(ctx.params.id);
@@ -119,6 +128,16 @@ export default class Works extends Controller {
    * @param {workId: string} 作品ID
    */
   @validInput(channelCreateRules, 'workCreateChannelFail')
+  @checkAppPermission(
+    { mongoose: 'Work', casl: 'Channel' },
+    'workPermissionFail',
+    {
+      value: {
+        type: 'body',
+        valueKey: 'workId',
+      },
+    }
+  )
   async createChannel() {
     const { ctx } = this;
     const { name, workId } = ctx.request.body;
@@ -139,6 +158,10 @@ export default class Works extends Controller {
    * 查找渠道
    * @param {id: string}  作品ID
    */
+  @checkAppPermission(
+    { mongoose: 'Work', casl: 'Channel' },
+    'workPermissionFail'
+  )
   async getWorksChannel() {
     const { ctx } = this;
     const { id } = ctx.params;
@@ -146,6 +169,17 @@ export default class Works extends Controller {
     ctx.helper.success({ ctx, resp: { channels, count: channels?.length } });
   }
 
+  @checkAppPermission(
+    { mongoose: 'Work', casl: 'Channel' },
+    'workPermissionFail',
+    {
+      key: 'channels.id',
+      value: {
+        type: 'params',
+        valueKey: 'channelId',
+      },
+    }
+  )
   async updateChannelName() {
     const { ctx } = this;
     const { channelId } = ctx.params;
@@ -162,6 +196,17 @@ export default class Works extends Controller {
     return ctx.helper.error({ ctx, errorType: 'workUpdateChannelFail' });
   }
 
+  @checkAppPermission(
+    { mongoose: 'Work', casl: 'Channel' },
+    'workPermissionFail',
+    {
+      key: 'channels.id',
+      value: {
+        type: 'params',
+        valueKey: 'channelId',
+      },
+    }
+  )
   async deleteChannel() {
     const { ctx } = this;
     const { channelId } = ctx.params;

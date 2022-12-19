@@ -106,7 +106,7 @@ export default class User extends Controller {
     // ctx.session.username = user.username;
     // Public claims 公共信息: should be unique like emial address or phone_number
     const token = ctx.app.jwt.sign(
-      { username: user.username },
+      { username: user.username, _id: user._id },
       ctx.app.config.secret,
       {
         expiresIn: 60 * 60,
