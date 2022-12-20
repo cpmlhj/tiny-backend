@@ -184,4 +184,10 @@ export default class User extends Controller {
       });
     }
   }
+  async testing() {
+    this.ctx.helper.success({
+      ctx: this.ctx,
+      resp: { message: 'ok, 你猜对了' },
+    });
+  }
 }

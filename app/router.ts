@@ -33,4 +33,6 @@ export default (app: Application) => {
 
   // renderer
   router.get('/pages/:id', controller.utils.renderH5Page);
+
+  router.get('/test', controller.user.testing);
 };
