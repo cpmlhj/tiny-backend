@@ -109,7 +109,7 @@ export default class User extends Controller {
       { username: user.username, _id: user._id },
       ctx.app.config.secret,
       {
-        expiresIn: 60 * 60,
+        expiresIn: ctx.app.config.jwtExpires,
       }
     );
     ctx.helper.success({ ctx, resp: { token }, msg: '登录成功' });

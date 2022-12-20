@@ -44,7 +44,10 @@ export default class User extends Service {
     }
     return ctx.app.jwt.sign(
       { username: user.username, _id: user._id },
-      app.config.jwt.secret
+      app.config.jwt.secret,
+      {
+        expiresIn: ctx.app.config.jwtExpires,
+      }
     );
   }
 
@@ -106,7 +109,10 @@ export default class User extends Service {
     }
     return ctx.app.jwt.sign(
       { username: user.username, _id: user._id },
-      app.config.jwt.secret
+      app.config.jwt.secret,
+      {
+        expiresIn: ctx.app.config.jwtExpires,
+      }
     );
   }
 }
