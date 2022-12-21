@@ -20,3 +20,5 @@ config/**/*.map
 typings/app/**
 typings/config/**
 webpack/uploadCdn.js
+.docker-volumes/**
+.env

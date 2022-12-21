@@ -185,9 +185,14 @@ export default class User extends Controller {
     }
   }
   async testing() {
+    const { ctx } = this;
+    const { status } = ctx.app.redis;
+    const { version } = await ctx.app.mongoose.connection.db.command({
+      buildInfo: 1,
+    });
     this.ctx.helper.success({
       ctx: this.ctx,
-      resp: { message: 'ok, 你猜对了' },
+      resp: { message: 'ok, 你猜对了', redis: status, mongo: version },
     });
   }
 }

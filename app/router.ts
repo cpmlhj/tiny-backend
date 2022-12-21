@@ -28,7 +28,7 @@ export default (app: Application) => {
   router.post('/channel', controller.works.createChannel);
   router.get('/getWorksChannel/:id', controller.works.getWorksChannel);
 
-  router.post('/utils/fileUpload', controller.utils.fileUploadByStream);
+  // router.post('/utils/fileUpload', controller.utils.fileUploadByStream);
   router.post('/utils/uploadToOSS', controller.utils.uploadToOSS);
 
   // renderer

@@ -1,0 +1,35 @@
+version: '3'
+services:
+  tiny-mongo:
+     image: mongo
+     container_name: tiny-mongo
+     volumes:
+      - '.docker-volumes/mongo/data:/data/db'
+      - '$PWD/mongo-entrypoint/:/docker-entrypoint-initdb.d/'
+     ports:
+      - 27017:27017
+     env_file:
+      - .env  
+  tiny-redis:
+    image: redis
+    container_name: tiny-redis
+    env_file:
+      - .env
+    ports:
+      - 6379:6379   
+    command: >
+      --requirepass ${REDIS_PASSWORD}
+  tiny-backend:
+     depends_on:
+      - tiny-mongo
+      - tiny-redis
+     build:
+      context: . # 当前目录
+      dockerfile: Dockerfile
+     image: tiny-backend     
+     container_name: tiny-backend
+     restart: always
+     ports:
+      - 7001:7001
+     env_file:
+      - .env  

@@ -1,39 +1,39 @@
 import { Controller } from 'egg';
-import sharp from 'sharp';
-import { parse, join, extname } from 'path';
+// import sharp from 'sharp';
+import { join, extname } from 'path';
 import { nanoid } from 'nanoid';
 import { createWriteStream } from 'fs';
-import { pipeline } from 'stream/promises';
+// import { pipeline } from 'stream/promises';
 import streamWormhole from 'stream-wormhole';
 import { MultipartFileStream } from 'egg-multipart';
 import BusBoy from 'busboy';
 
 export default class UtilsController extends Controller {
-  async fileUploadWithLocal() {
-    const { ctx } = this;
-    const file = ctx.request.files[0];
-    // 使用 sharp 剪切图片
-    const imageSource = sharp(file.filepath);
-    const metaData = await imageSource.metadata();
-    let thumbnailFilePath;
-    // 检测图片宽度
-    if (metaData.width && metaData.width > 300) {
-      // generate a new file path
-      // uploads/**/abc.png  ==> /uploads/**/abc-thumbnail.png
-      const { name, ext, dir } = parse(file.filepath);
-      thumbnailFilePath = join(dir, `${name}-thumbnail${ext}`);
-      await imageSource.resize({ width: 300 }).toFile(thumbnailFilePath);
-      thumbnailFilePath = this.pathToURL(thumbnailFilePath);
-    }
-    const filePath = this.pathToURL(file.filepath);
-    ctx.helper.success({
-      ctx,
-      resp: {
-        filePath,
-        thumbnailFilePath: thumbnailFilePath ? thumbnailFilePath : filePath,
-      },
-    });
-  }
+  // async fileUploadWithLocal() {
+  //   const { ctx } = this;
+  //   const file = ctx.request.files[0];
+  //   // 使用 sharp 剪切图片
+  //   const imageSource = sharp(file.filepath);
+  //   const metaData = await imageSource.metadata();
+  //   let thumbnailFilePath;
+  //   // 检测图片宽度
+  //   if (metaData.width && metaData.width > 300) {
+  //     // generate a new file path
+  //     // uploads/**/abc.png  ==> /uploads/**/abc-thumbnail.png
+  //     const { name, ext, dir } = parse(file.filepath);
+  //     thumbnailFilePath = join(dir, `${name}-thumbnail${ext}`);
+  //     await imageSource.resize({ width: 300 }).toFile(thumbnailFilePath);
+  //     thumbnailFilePath = this.pathToURL(thumbnailFilePath);
+  //   }
+  //   const filePath = this.pathToURL(file.filepath);
+  //   ctx.helper.success({
+  //     ctx,
+  //     resp: {
+  //       filePath,
+  //       thumbnailFilePath: thumbnailFilePath ? thumbnailFilePath : filePath,
+  //     },
+  //   });
+  // }
 
   pathToURL(path: string) {
     const { app } = this;
@@ -41,49 +41,49 @@ export default class UtilsController extends Controller {
     return replaePath;
   }
 
-  async fileUploadByStream() {
-    const { ctx, app } = this;
-    const fileStream = await ctx.getFileStream();
-    // uploads/***.[ext]
-    // uploads/***_thumbnail.[ext]
-    const uid = nanoid(6);
-    const timestamps = Date.now();
-    const filePath = join(
-      app.config.baseDir,
-      'uploads',
-      `${timestamps}_${uid}${extname(fileStream.filename)}`
-    );
-    const thumbnailFilePath = join(
-      app.config.baseDir,
-      'uploads',
-      `${timestamps}_${uid}_thumbnail${extname(fileStream.filename)}`
-    );
-    const fileWriteStream = createWriteStream(filePath);
-    const thumbnailWriteStream = createWriteStream(thumbnailFilePath);
-    const transformStream = sharp().resize({ width: 300 });
-    try {
-      // 也可以使用pipeline
-      await Promise.all([
-        pipeline(fileStream, fileWriteStream),
-        new Promise((resolve, reject) => {
-          fileStream
-            .on('error', reject)
-            .pipe(transformStream)
-            .on('error', reject)
-            .pipe(thumbnailWriteStream)
-            .on('finish', resolve)
-            .on('error', reject);
-        }),
-      ]);
-      const resp = {
-        url: this.pathToURL(filePath),
-        thumbnailFilePath: this.pathToURL(thumbnailFilePath),
-      };
-      ctx.helper.success({ ctx, resp });
-    } catch (e) {
-      ctx.helper.error({ ctx, errorType: 'imageUpLoadFialInfo', error: e });
-    }
-  }
+  // async fileUploadByStream() {
+  //   const { ctx, app } = this;
+  //   const fileStream = await ctx.getFileStream();
+  //   // uploads/***.[ext]
+  //   // uploads/***_thumbnail.[ext]
+  //   const uid = nanoid(6);
+  //   const timestamps = Date.now();
+  //   const filePath = join(
+  //     app.config.baseDir,
+  //     'uploads',
+  //     `${timestamps}_${uid}${extname(fileStream.filename)}`
+  //   );
+  //   const thumbnailFilePath = join(
+  //     app.config.baseDir,
+  //     'uploads',
+  //     `${timestamps}_${uid}_thumbnail${extname(fileStream.filename)}`
+  //   );
+  //   const fileWriteStream = createWriteStream(filePath);
+  //   const thumbnailWriteStream = createWriteStream(thumbnailFilePath);
+  //   const transformStream = sharp().resize({ width: 300 });
+  //   try {
+  //     // 也可以使用pipeline
+  //     await Promise.all([
+  //       pipeline(fileStream, fileWriteStream),
+  //       new Promise((resolve, reject) => {
+  //         fileStream
+  //           .on('error', reject)
+  //           .pipe(transformStream)
+  //           .on('error', reject)
+  //           .pipe(thumbnailWriteStream)
+  //           .on('finish', resolve)
+  //           .on('error', reject);
+  //       }),
+  //     ]);
+  //     const resp = {
+  //       url: this.pathToURL(filePath),
+  //       thumbnailFilePath: this.pathToURL(thumbnailFilePath),
+  //     };
+  //     ctx.helper.success({ ctx, resp });
+  //   } catch (e) {
+  //     ctx.helper.error({ ctx, errorType: 'imageUpLoadFialInfo', error: e });
+  //   }
+  // }
 
   async uploadToOSS() {
     const { ctx } = this;
