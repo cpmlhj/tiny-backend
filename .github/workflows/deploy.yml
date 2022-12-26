@@ -1,0 +1,33 @@
+name: Deploy app to server
+on: [push]
+jobs:
+  delpoy-and-restart:
+    runs-on: ubuntu-latest
+    steps:
+       # checkout 
+      - uses: actions/checkout@v2
+       # 创建 .env
+      - name: "create env file"
+        run: |
+        touch .env
+        echo ALC_ACCESS_KEY=${{ secrets.ALC_ACCESS_KEY }} >> .env
+        echo ACL_SECRET_KEY=${{ secrets.ACL_SECRET_KEY }} >> .env
+        echo MONGO_DB_PASSWORD=${{ secrets.MONGO_DB_PASSWORD }} >> .env 
+        echo MONGO_DB_USERNAME=${{ secrets.MONGO_DB_USERNAME }} >> .env 
+        echo MONGO_INITDB_ROOT_PASSWORD=${{ secrets.MONGO_INITDB_ROOT_PASSWORD }} >> .env 
+        echo MONGO_INITDB_ROOT_USERNAME=${{ secrets.MONGO_INITDB_ROOT_USERNAME }} >> .env 
+        echo REDIS_PASSWORD=${{ secrets.REDIS_PASSWORD }} >> .env 
+      - name: "copy files "
+        run: |
+          mkdir -p tiny-backend
+          cp .env docker-compose-prod.yml tiny-backend
+          cp -r  mongo-entrypoint tiny-backend
+          ls -a tiny-backend
+      - name: "scp"
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{secrets.ESC_HOST}} 
+          username: ${{secrets.ESC_USERNAME}} 
+          password: ${{secrets.ESC_PWD}}
+          source: 'tiny-backend' 
+          target:  "~"
