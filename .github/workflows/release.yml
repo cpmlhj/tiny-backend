@@ -1,0 +1,66 @@
+name: 自动部署版本到服务器
+on:
+  push:
+    tags:
+      - 'v.*.*.*'
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      # 创建 .env
+      - name: 'create .env'
+        run: |
+          touch .env
+          echo ACL_ACCESS_KEY=${{ secrets.ACL_ACCESS_KEY }} >> .env
+          echo ACL_SECRET_KEY=${{ secrets.ACL_SECRET_KEY }} >> .env
+          echo MONGO_DB_PASSWORD=${{ secrets.MONGO_DB_PASSWORD }} >> .env 
+          echo MONGO_DB_USERNAME=${{ secrets.MONGO_DB_USERNAME }} >> .env 
+          echo MONGO_INITDB_ROOT_PASSWORD=${{ secrets.MONGO_INITDB_ROOT_PASSWORD }} >> .env 
+          echo MONGO_INITDB_ROOT_USERNAME=${{ secrets.MONGO_INITDB_ROOT_USERNAME }} >> .env 
+          echo REDIS_PASSWORD=${{ secrets.REDIS_PASSWORD }} >> .env
+      - name: 'docker login'
+        uses: aliyun/acr-login@v1
+        with:
+          login-server: https://registry.cn-shenzhen.aliyuncs.com
+          region-id: cn-shenzhen
+          username: '${{secrets.ACR_USERNAME}}'
+          password: '${{secrets.ACR_PASSWORD}}'
+      - name: build image for docker
+        run: docker build -t "registry.cn-shenzhen.aliyuncs.com/cpm_tiny/tiny:${{github.ref_name}}" .
+      - name: push image to ACR
+        run: docker push registry.cn-shenzhen.aliyuncs.com/cpm_tiny/tiny:${{github.ref_name}}
+      # 替换 compose tag
+      - name: 'replace tag'
+        uses: jacobtomlinson/gha-find-replace@v2
+        with:
+          find: '{{tag}}'
+          replace: ${{github.ref_name}}
+          include: 'docker-compose-prod.yml'
+      - name: 'copy files'
+        run: |
+          mkdir -p tiny-backend
+          cp .env docker-compose-prod.yml tiny-backend
+          cp -r  mongo-entrypoint tiny-backend
+          ls -a tiny-backend
+      - name: 'scp'
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{secrets.ESC_HOST}}
+          username: ${{secrets.ESC_USERNAME}}
+          password: ${{secrets.ESC_PWD}}
+          source: 'tiny-backend'
+          target: '~'
+      # 重启 docker 服务
+      - name: 'executing ssh and run docker'
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{secrets.ESC_HOST}}
+          username: ${{secrets.ESC_USERNAME}}
+          password: ${{secrets.ESC_PWD}}
+          script_stop: true
+          script: |
+            docker login --username=${{secrets.ACR_USERNAME}} --password=${{secrets.ACR_PASSWORD}} registry.cn-shenzhen.aliyuncs.com
+            cd ~/tiny-backend/
+            docker compose -f docker-compose-prod.yml down
+            docker compose -f docker-compose-prod.yml up -d

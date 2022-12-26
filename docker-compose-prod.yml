@@ -20,7 +20,7 @@ services:
     command: >
       --requirepass ${REDIS_PASSWORD}
   tiny-backend:
-    image: registry.cn-shenzhen.aliyuncs.com/cpm_tiny/tiny:0.0.2
+    image: registry.cn-shenzhen.aliyuncs.com/cpm_tiny/tiny:{{tag}}
     container_name: tiny-backend
     ports:
      - 7003:7001
