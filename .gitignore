@@ -13,7 +13,6 @@ logs/
 
 app/**/*.js
 test/**/*.ts
-config/**/*.ts
 app/**/*.map
 test/**/*.map
 config/**/*.map

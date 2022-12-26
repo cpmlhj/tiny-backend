@@ -10,7 +10,7 @@ jobs:
       - name: 'create env file'
         run: |
           touch .env
-          echo ALC_ACCESS_KEY=${{ secrets.ALC_ACCESS_KEY }} >> .env
+          echo ACL_ACCESS_KEY=${{ secrets.ACL_ACCESS_KEY }} >> .env
           echo ACL_SECRET_KEY=${{ secrets.ACL_SECRET_KEY }} >> .env
           echo MONGO_DB_PASSWORD=${{ secrets.MONGO_DB_PASSWORD }} >> .env 
           echo MONGO_DB_USERNAME=${{ secrets.MONGO_DB_USERNAME }} >> .env 
@@ -31,3 +31,15 @@ jobs:
           password: ${{secrets.ESC_PWD}}
           source: 'tiny-backend'
           target: '~'
+      - name: 'executing ssh and run docker'
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{secrets.ESC_HOST}}
+          username: ${{secrets.ESC_USERNAME}}
+          password: ${{secrets.ESC_PWD}}
+          script_stop: true
+          script: |
+            docker login --username=${{secrets.ACR_USERNAME}} --password=${{secrets.ACR_PASSWORD}} registry.cn-shenzhen.aliyuncs.com
+            cd ~/tiny-backend/
+            docker compose -f docker-compose-prod.yml down
+            docker compose -f docker-compose-prod.yml up -d
