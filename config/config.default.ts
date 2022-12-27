@@ -100,8 +100,8 @@ export default (appInfo: EggAppInfo) => {
     baseUrl: 'default.url',
     thirdParty: {
       A: {
-        accessKeyId: process.env.ACL_ACCESS_KEY,
-        accessKeySecret: process.env.ACL_SECRET_KEY,
+        accessKeyId: process.env.ACL_ACCESS_KEY!,
+        accessKeySecret: process.env.ACL_SECRET_KEY!,
         endPoint: 'dysmsapi.aliyuncs.com',
         SMS_CONFIG: {
           signName: 'CPMLHJTINY',
